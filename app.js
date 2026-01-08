@@ -4,17 +4,17 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRouter = require("./routes/authroute");
 const taskRouter = require("./routes/taskroutes");
-const cors = require("cors");
+const cors = require("cors"); 
 
 const cookieParser = require("cookie-parser");
 
 const app = express();
-app.use(
-  cors({
-    origin: "https://workwiselybyme.netlify.app/",
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: "https://workwiselybyme.netlify.app", // No trailing slash!
+  credentials: true, // Required for the login cookie to work
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
