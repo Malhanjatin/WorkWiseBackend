@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/tasks", taskRouter);
 
-const PORT = 3001;
+const PORT = process.env.PORT;
 const Mongo_Url =process.env.MONGO_URL;
  
 mongoose
