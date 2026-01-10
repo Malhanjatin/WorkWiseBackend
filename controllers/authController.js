@@ -6,6 +6,7 @@ const {
 const { validationResult } = require("express-validator");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const { findById } = require("../models/taskModel");
 
 /* ================= LOGIN ================= */
 
@@ -32,11 +33,29 @@ exports.postLogin = async (req, res) => {
       return res.status(401).json({ message: "invalid email or password" });
     }
 
+     console.log("🔵 User authenticated, generating tokens...");
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
+    
+    console.log("🔑 Access Token generated:", accessToken ? "YES" : "NO");
+    console.log("🔑 Refresh Token generated:", refreshToken ? "YES" : "NO");
+    console.log("🔑 Refresh Token (first 50 chars):", refreshToken.substring(0, 50));
 
+    console.log("📝 BEFORE SAVE - user.refreshToken:", user.refreshToken);
+    
     user.refreshToken = refreshToken;
+    console.log("📝 AFTER ASSIGNMENT - user.refreshToken:", user.refreshToken);
+    console.log("📝 User modified paths:", user.modifiedPaths());
+    console.log("📝 Is refreshToken modified?", user.isModified('refreshToken'));
+
     await user.save();
+        console.log("💾 SAVE COMPLETED");
+
+const verifyUser = await User.findById(user._id)
+console.log("verification - refresh token in db", verifyUser.refreshToken ? " EXISTS": "NULL");
+
+
+
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -45,6 +64,7 @@ exports.postLogin = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    console.log("login successfull cookie set")
     return res.status(200).json({
       message: "login successful",
       user: { email: user.email, id: user._id },
