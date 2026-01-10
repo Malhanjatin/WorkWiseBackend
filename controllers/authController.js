@@ -144,7 +144,11 @@ exports.refreshAccessToken = async (req, res) => {
 
     return res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
-    res.clearCookie("refreshToken");
+    res.clearCookie("refreshToken",{
+      httpOnly:true,
+      secure:true,
+      sameSite:"none",
+    });
     return res.status(403).json({
       message: "refresh token expired or invalid",
     });

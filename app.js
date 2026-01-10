@@ -20,6 +20,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Health check route
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    service: "Workwise Backend",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/tasks", taskRouter);
 
