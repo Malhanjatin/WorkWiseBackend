@@ -10,6 +10,7 @@ const bcrypt = require("bcryptjs");
 /* ================= LOGIN ================= */
 
 exports.postLogin = async (req, res) => {
+  console.log("login hit")
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({
