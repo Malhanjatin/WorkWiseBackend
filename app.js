@@ -10,7 +10,7 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 app.use(cors({
-  origin: "https://workwiselybyme.netlify.app", // No trailing slash!
+  origin: "https://workwiseproductivity.netlify.app", // No trailing slash!
   credentials: true, // Required for the login cookie to work
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
