@@ -6,12 +6,12 @@ const {
 const { validationResult } = require("express-validator");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
-const { findById } = require("../models/taskModel");
+
 
 /* ================= LOGIN ================= */
 
 exports.postLogin = async (req, res) => {
-  console.log("login hit")
+  console.log("login hit");
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({
@@ -33,29 +33,35 @@ exports.postLogin = async (req, res) => {
       return res.status(401).json({ message: "invalid email or password" });
     }
 
-     console.log("🔵 User authenticated, generating tokens...");
+    console.log("🔵 User authenticated, generating tokens...");
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    
+
     console.log("🔑 Access Token generated:", accessToken ? "YES" : "NO");
     console.log("🔑 Refresh Token generated:", refreshToken ? "YES" : "NO");
-    console.log("🔑 Refresh Token (first 50 chars):", refreshToken.substring(0, 50));
+    console.log(
+      "🔑 Refresh Token (first 50 chars):",
+      refreshToken.substring(0, 50)
+    );
 
     console.log("📝 BEFORE SAVE - user.refreshToken:", user.refreshToken);
-    
+
     user.refreshToken = refreshToken;
     console.log("📝 AFTER ASSIGNMENT - user.refreshToken:", user.refreshToken);
     console.log("📝 User modified paths:", user.modifiedPaths());
-    console.log("📝 Is refreshToken modified?", user.isModified('refreshToken'));
-
+    console.log(
+      "📝 Is refreshToken modified?",
+      user.isModified("refreshToken")
+    );
+user.isActive = true;
     await user.save();
-        console.log("💾 SAVE COMPLETED");
+    console.log("💾 SAVE COMPLETED");
 
-const verifyUser = await User.findById(user._id)
-console.log("verification - refresh token in db", verifyUser.refreshToken ? " EXISTS": "NULL");
-
-
-
+    const verifyUser = await User.findById(user._id);
+    console.log(
+      "verification - refresh token in db",
+      verifyUser.refreshToken ? " EXISTS" : "NULL"
+    );
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -64,10 +70,10 @@ console.log("verification - refresh token in db", verifyUser.refreshToken ? " EX
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    console.log("login successfull cookie set")
+    console.log("login successfull cookie set");
     return res.status(200).json({
       message: "login successful",
-      user: { email: user.email, id: user._id },
+      user: { email: user.email, id: user._id , role:user.role},
       accessToken,
     });
   } catch (error) {
@@ -99,9 +105,12 @@ exports.postSignup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    const userRole = (email==="jatinmalhan2300@gmail.com") ? "admin": "user";
+
     await User.create({
       email,
       password: hashedPassword,
+      role:userRole,
     });
 
     return res.status(201).json({ message: "user created successfully" });
@@ -165,10 +174,10 @@ exports.refreshAccessToken = async (req, res) => {
 
     return res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
-    res.clearCookie("refreshToken",{
-      httpOnly:true,
-      secure:true,
-      sameSite:"none",
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
     });
     return res.status(403).json({
       message: "refresh token expired or invalid",
@@ -184,7 +193,8 @@ exports.logOut = async (req, res) => {
   if (token) {
     await User.updateOne(
       { refreshToken: token },
-      { $unset: { refreshToken: "" } }
+      { $unset: { refreshToken: "" } },
+      { $set : {isActive:false }}
     );
   }
 

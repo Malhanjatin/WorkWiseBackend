@@ -4,13 +4,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRouter = require("./routes/authroute");
 const taskRouter = require("./routes/taskroutes");
+const AdminRouter= require('./routes/admin')
 const cors = require("cors"); 
 
 const cookieParser = require("cookie-parser");
 
 const app = express();
 app.use(cors({
-  origin: "https://workwiseproductivity.netlify.app", // No trailing slash!
+  origin:["https://workwiseproductivity.netlify.app" , "http://localhost:5173/", "http://localhost:5173"],  // 
   credentials: true, // Required for the login cookie to work
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/tasks", taskRouter);
+app.use('/api/admin', AdminRouter)
 
 const PORT = process.env.PORT;
 const Mongo_Url =process.env.MONGO_URL;
