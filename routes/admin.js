@@ -21,7 +21,7 @@ AdminRouter.get('/activeUsers', async (req,res)=>{
             isActive:true,
             role: { $ne : "admin"}
         })
-        res.json(activeUsers)
+        res.json({activeUsers})
     }
     catch(err){
         res.status(500).json({message: "server error"})
