@@ -7,7 +7,6 @@ const { validationResult } = require("express-validator");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 
-
 /* ================= LOGIN ================= */
 
 exports.postLogin = async (req, res) => {
@@ -53,7 +52,7 @@ exports.postLogin = async (req, res) => {
       "📝 Is refreshToken modified?",
       user.isModified("refreshToken")
     );
-user.isActive = true;
+    user.isActive = true;
     await user.save();
     console.log("💾 SAVE COMPLETED");
 
@@ -73,7 +72,7 @@ user.isActive = true;
     console.log("login successfull cookie set");
     return res.status(200).json({
       message: "login successful",
-      user: { email: user.email, id: user._id , role:user.role},
+      user: { email: user.email, id: user._id, role: user.role },
       accessToken,
     });
   } catch (error) {
@@ -105,12 +104,12 @@ exports.postSignup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const userRole = (email==="jatinmalhan2300@gmail.com") ? "admin": "user";
+    const userRole = email === "jatinmalhan2300@gmail.com" ? "admin" : "user";
 
     await User.create({
       email,
       password: hashedPassword,
-      role:userRole,
+      role: userRole,
     });
 
     return res.status(201).json({ message: "user created successfully" });
@@ -193,8 +192,10 @@ exports.logOut = async (req, res) => {
   if (token) {
     await User.updateOne(
       { refreshToken: token },
-      { $unset: { refreshToken: "" } },
-      { $set : {isActive:false }}
+      {
+       $unset: { refreshToken: "" } ,
+      $set: { isActive: false } 
+      }
     );
   }
 
